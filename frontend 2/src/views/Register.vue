@@ -1,5 +1,7 @@
 <template>
+
   <div class='container'>
+
     <div class='card o-hidden border-0 shadow-lg my-5'>
       <div class='card-body p-0'>
         <!-- Nested Row within Card Body -->
@@ -7,9 +9,13 @@
           <div class='col-lg-5 d-none d-lg-block bg-register-image'></div>
           <div class='col-lg-7'>
             <div class='p-5'>
-              <div class='text-center'>
+              <div class='text-center' v-if="!showMessage">
                 <h1 class='h4 text-gray-900 mb-4'>Crear una Cuenta</h1>
               </div>
+              <div class='text-center' v-if="showMessage">
+                <h1 class='h4 text-gray-900 mb-4'>Confirmar la cuenta</h1>
+              </div>
+
               <form class='user'>
                 <!--<div class="form-group row">-->
                 <!--<div class="col-sm-6 mb-3 mb-sm-0">-->
@@ -19,18 +25,32 @@
                 <!--<input type="text" class="form-control form-control-user" id="exampleLastName" placeholder="Apellidos">-->
                 <!--</div>-->
                 <!--</div>-->
-                <div class='form-group'>
+
+                <div class='form-group' v-if="!showMessage">
+
+
                   <input type='text'
                          :class="{'form-control': true, 'form-control-user': true, 'border-danger': error.showError}"
                          id='inputUsername' placeholder='Introduzca el nombre de usuario'
                          v-model.trim='newUserInfo.username'>
                 </div>
-                <div class='form-group'>
+                <div class='form-group' v-if="!showMessage">
                   <input type='email'
                          :class="{'form-control': true, 'form-control-user': true, 'border-danger': error.showError}"
                          placeholder='Introduzca la dirección de correo' v-model='newUserInfo.email'>
                 </div>
-                <div class='form-group row'>
+                <div class='form-group' v-if="showMessage">
+                  <div class='text-center'>
+                    <h1 class='h4 text-gray-900 mb-4'>Se le envio un correo para confirmar la cuenta</h1>
+                    <a class='btn btn-primary btn-user btn-block text-white' @click='redirectLogin' v-if="showMessage">
+                      Login
+                    </a>
+
+                  </div>
+                </div>
+
+
+                <div class='form-group row' v-if="!showMessage">
                   <div class='col-sm-6 mb-3 mb-sm-0'>
                     <input type='password'
                            :class="{'form-control': true, 'form-control-user': true, 'border-danger': error.showError}"
@@ -44,22 +64,29 @@
                 </div>
                 <div v-if='error.showError' class='form-group'>
                   <div class='card bg-danger text-white small animated--grow-in'>
-                    <div class='card-body'>{{error.message}}</div>
+                    <div class='card-body'>{{ error.message }}</div>
                   </div>
                 </div>
-                <a class='btn btn-primary btn-user btn-block text-white' @click='register'>
+
+
+                <a class='btn btn-primary btn-user btn-block text-white' @click='register' v-if="!showMessage">
                   Registrarse
                 </a>
+
               </form>
               <hr>
               <!-- <div class="text-center">
                   <a class="small" href="forgot-password.html">Recuperar Contraseña</a>
               </div> -->
+
+
               <div class='text-center'>
                 <router-link :to="{name: 'loginPage'}" class='small text-dark'><strong>¡Ya estoy registrado!</strong>
                 </router-link>
               </div>
+
             </div>
+
           </div>
         </div>
         <!-- Footer -->
@@ -91,9 +118,13 @@ export default {
         showError: false,
         message: 'Ha ocurrido un Error.',
       },
+      showMessage: false
     };
   },
   methods: {
+    redirectLogin() {
+      this.$router.push({name: 'loginPage'});
+    },
     checkEmail() {
       // Check better if possible
       let pos = this.newUserInfo.email.indexOf('@');
@@ -118,7 +149,10 @@ export default {
           console.log('Handling the registration.');
           this.$store.state.profile.register(this.newUserInfo.username, this.newUserInfo.email, this.newUserInfo.password1).then(result => {
             if (result.hasOwnProperty('error') === false) {
-              this.$router.push({ name: 'loginPage' });
+              //cambiar aqui, poner la variable para que se muestre el cartel en true y hacer el metodo que si presiona el boton lo
+              //redirecciona al login
+              //this.$router.push({name: 'loginPage'});
+              this.showMessage = true
             } else {
               console.log(result.error + ':' + result.message);
               this.error.message = result.message;

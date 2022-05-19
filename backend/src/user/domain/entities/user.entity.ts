@@ -84,7 +84,8 @@ export class User extends DomainEntity<UserProps> {
         }
 
 
-        const passwordOrError = Guard.againstAtLeast({argumentPath: 'password', numChars: 5, argument: props.password});
+        const passwordOrError = Guard.againstAtLeast(
+            {argumentPath: 'password', numChars: 5, argument: props.password});
         if (!passwordOrError.succeeded) {
             return Result.Fail(new AppError.ValidationError(passwordOrError.message));
         }
